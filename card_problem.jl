@@ -1,6 +1,5 @@
 import Base: +, -, ==, push!
 using Plots
-import Plots: bar
 
 function remove_trailing_zeros(a::AbstractVector)
     counter = 0
@@ -46,6 +45,7 @@ function +(hand::Hand, card::Int)
     return Hand(newcards)
 end
 
+
 function -(hand::Hand, card::Int)
     newcards = copy(hand.cards)
     len = length(hand.cards)
@@ -60,7 +60,9 @@ function -(hand::Hand, card::Int)
     return Hand(newcards)
 end
 
+
 ==(hand1::Hand, hand2::Hand) = all(.==(hand1.cards, hand2.cards))
+
 
 function evaluate(hand::Hand)
     cards = hand.cards
@@ -128,12 +130,6 @@ end
 
 ischild(candidate::Hand, parent::Hand) = isparent(parent, candidate)
 
-bad_hand = Hand(rand(1:10, 5))
-good_hand = Hand([])
-for _ = 1:sum(bad_hand.cards)
-    good_hand = add_optimal(good_hand)
-end
-
 function distance(hand1::Hand, hand2::Hand)
     h1 = hand1.cards
     h2 = hand2.cards
@@ -146,14 +142,23 @@ function distance(hand1::Hand, hand2::Hand)
     sum(h1 - h2 .!= 0)
 end
 
-starting_distance = distance(good_hand, bad_hand)
-dist = distance(good_hand, bad_hand)
-while dist != 0
-    println("$dist")
+bad_hand = Hand(rand(1:10, 10))
+good_hand = Hand([])
+for _ = 1:sum(bad_hand.cards)
     good_hand = add_optimal(good_hand)
-    bad_hand = add_optimal(bad_hand)
 end
 
+starting_distance = distance(good_hand, bad_hand)
+dist = distance(good_hand, bad_hand)
+dist_vect = Int[]
+while dist != 0
+    good_hand = add_optimal(good_hand)
+    bad_hand = add_optimal(bad_hand)
+    dist = distance(good_hand, bad_hand)
+    push!(dist_vect, dist)
+end
+
+Plots.plot(dist_vect)
 good_hand
 
 1
